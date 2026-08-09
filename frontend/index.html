@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPG Economic Analysis System</title>
+    <style>
+        body { 
+            background-color: #000000; 
+            background-image: radial-gradient(circle at 15% 50%, rgba(20, 50, 80, 0.4), transparent 50%), 
+                              radial-gradient(circle at 85% 30%, rgba(10, 60, 40, 0.4), transparent 50%);
+            color: #f5f5f7; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            padding: 15px 20px; 
+            margin: 0;
+            height: 100vh; 
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; 
+        }
+        
+        h2 {
+            font-size: 20px; font-weight: 600; margin: 0 0 12px 0; flex: 0 0 auto;
+            background: -webkit-linear-gradient(45deg, #30d158, #0a84ff);
+            background: linear-gradient(45deg, #30d158, #0a84ff);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard { display: flex; flex-direction: row; gap: 15px; flex: 1; min-height: 0; }
+        
+        .left-sidebar { flex: 0 0 320px; display: flex; flex-direction: column; overflow-y: auto; padding-right: 5px; }
+        .right-main { flex: 1; display: flex; flex-direction: column; gap: 15px; min-width: 0; }
+
+        .panel { 
+            background: rgba(28, 28, 30, 0.6); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 18px; 
+            border-radius: 16px; 
+            display: flex; flex-direction: column;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .kpi-panel { flex: 0 0 auto; }
+        .charts-panel { flex: 1; min-height: 0; }
+
+        h3 {
+            font-size: 14px; font-weight: 500; color: #86868b;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 6px; margin: 0 0 12px 0; flex: 0 0 auto;
+        }
+
+        .slider-group { margin-bottom: 12px; }
+        .slider-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 12px; color: #d2d2d7; font-weight: 500; }
+        .slider-value { color: #0a84ff; font-weight: 600; font-size: 13px; }
+        
+        input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; background: transparent; }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 5px; cursor: pointer; background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
+        input[type=range]::-webkit-slider-thumb { height: 16px; width: 16px; border-radius: 50%; background: #ffffff; cursor: pointer; -webkit-appearance: none; appearance: none; margin-top: -5.5px; box-shadow: 0 0 8px rgba(10, 132, 255, 0.5); transition: transform 0.1s; }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
+        .kpi-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 10px 8px; border-radius: 12px; text-align: center; }
+        .kpi-title { font-size: 11px; color: #86868b; margin-bottom: 4px; font-weight: 500; }
+        .kpi-value { font-size: 18px; font-weight: 600; color: #ffffff; letter-spacing: 0.5px; }
+        .highlight-finance .kpi-value { color: #30d158; }
+
+        .tooltip { display: inline-flex; justify-content: center; align-items: center; width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.2); color: #fff; font-size: 9px; margin-left: 4px; cursor: help; position: relative; font-weight: bold; }
+        .tooltip::after { content: attr(data-tip); position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%); background: rgba(40, 40, 40, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 11px; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10; font-weight: normal; }
+        .tooltip:hover::after { opacity: 1; visibility: visible; bottom: 150%; }
+        
+        select { width: 100%; padding: 6px 8px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; outline: none; cursor: pointer; font-size: 12px; font-family: inherit; }
+        select option { background: #2d2d2d; color: white; }
+
+        .charts-wrapper { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 15px; width: 100%; flex: 1; min-height: 0; }
+        .chart-item { width: 100%; height: 100%; min-height: 0; }
+
+        @media (max-width: 1000px) {
+            .dashboard { flex-direction: column; overflow-y: auto; }
+            .left-sidebar { flex: 0 0 auto; width: 100%; }
+            .charts-wrapper { grid-template-columns: 1fr; grid-template-rows: auto; }
+            .chart-item { min-height: 250px; }
+        }
+
+        .rangeslider-container .scatterlayer { display: none !important; }
+        .rangeslider-bg { fill: #2c2c2e !important; stroke: none !important; }
+        .rangeslider-mask-min, .rangeslider-mask-max { fill: rgba(0, 0, 0, 0.6) !important; }
+    </style>
+</head>
+<body>
+    <h2>CPGEAS</h2>
+    
+    <div class="dashboard">
+        <div class="left-sidebar panel">
+            <h3>Physical & Economic Parameters</h3>
+            <div class="slider-group">
+                <div class="slider-label"><span>Select Site <span class="tooltip" data-tip="Switch between site-specific AI models and geological constants">?</span></span></div>
+                <select id="site_id"><option value="KYS">Taoyuan Guanyinshan (KYS)</option></select>
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>Permeability <span class="tooltip" data-tip="Ability of rock to transmit fluids, affecting CO2 circulation rate">?</span></span><span class="slider-value" id="val_permeability_md">1100 mD</span></div>
+                <input type="range" id="permeability_md" min="100" max="1500" value="1100" step="10">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>Porosity <span class="tooltip" data-tip="Ratio of void space in rock, affecting geothermal storage capacity">?</span></span><span class="slider-value" id="val_porosity">0.15 %</span></div>
+                <input type="range" id="porosity" min="0.01" max="0.3" value="0.15" step="0.01">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>Carbon Tax Price <span class="tooltip" data-tip="Carbon tax cost per ton of CO2 leakage">?</span></span><span class="slider-value" id="val_carbon_price">300 NTD</span></div>
+                <input type="range" id="carbon_price" min="0" max="5000" value="300" step="10">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>Feed-in Tariff (FIT) <span class="tooltip" data-tip="Guaranteed government purchase price per kWh of green electricity">?</span></span><span class="slider-value" id="val_fit_rate">8.55 NTD</span></div>
+                <input type="range" id="fit_rate" min="1.0" max="15.0" value="8.55" step="0.01">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>Discount Rate <span class="tooltip" data-tip="Interest rate reflecting the time value of money and investment risk">?</span></span><span class="slider-value" id="val_discount_rate">5.25 %</span></div>
+                <input type="range" id="discount_rate" min="0.01" max="0.15" value="0.0525" step="0.0025">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>Capacity Factor <span class="tooltip" data-tip="Ratio of actual electrical energy output to maximum possible output">?</span></span><span class="slider-value" id="val_capacity_factor">80 %</span></div>
+                <input type="range" id="capacity_factor" min="0.5" max="1.0" value="0.8" step="0.01">
+            </div>
+        </div>
+
+        <div class="right-main">
+            <div class="panel kpi-panel">
+                <h3>Financial & Physical KPIs (6-Well Field)</h3>
+                <div class="kpi-grid">
+                    <div class="kpi-box highlight-finance"><div class="kpi-title">LCOE <span class="tooltip" data-tip="Levelized Cost of Energy: Average cost per kWh generated over the project's lifetime">?</span></div><span id="lcoe" class="kpi-value">0.00</span></div>
+                    <div class="kpi-box highlight-finance"><div class="kpi-title">IRR <span class="tooltip" data-tip="Internal Rate of Return: Annualized return on investment; higher is better">?</span></div><span id="irr" class="kpi-value">0.00</span></div>
+                    <div class="kpi-box highlight-finance"><div class="kpi-title">Payback Period <span class="tooltip" data-tip="Discounted Payback Period: Years required to recover the initial investment">?</span></div><span id="dpp" class="kpi-value">0.00</span></div>
+                    <div class="kpi-box"><div class="kpi-title">Est. Annual Gen.</div><span id="annual_power_mwh" class="kpi-value">0</span></div>
+                    <div class="kpi-box"><div class="kpi-title">Avg. Bottom Temp.</div><span id="kpi_temp" class="kpi-value">0.00</span></div>
+                    <div class="kpi-box"><div class="kpi-title">Avg. Bottom Press.</div><span id="kpi_pressure" class="kpi-value">0</span></div>
+                    <div class="kpi-box"><div class="kpi-title">Avg. CO2 Flow Rate</div><span id="kpi_flow" class="kpi-value">0.00</span></div>
+                    <div class="kpi-box"><div class="kpi-title">Annual Carbon Cost</div><span id="annual_co2_tons" class="kpi-value">0</span></div>
+                </div>
+            </div>
+
+            <div class="panel charts-panel">
+                <h3>Project Forecast Curves (Drag slider or scroll to zoom)</h3>
+                <div class="charts-wrapper">
+                    <div id="npv-chart" class="chart-item"></div>
+                    <div id="flow-chart" class="chart-item"></div>
+                    <div id="temp-chart" class="chart-item"></div>
+                    <div id="pressure-chart" class="chart-item"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>

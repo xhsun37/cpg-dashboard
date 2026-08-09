@@ -1,0 +1,16 @@
+程式啟動
+cd 其他\創業\程式\天氣\backend
+conda activate test
+python main.py
+
+github上傳
+cd 創業\程式\天氣
+git push
+
+API開啟
+uvicorn main:app --reload
+deactivate
+
+程式訓練
+conda activate test
+python train_ai_model.py

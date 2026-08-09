@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+numpy
+numpy-financial
+CoolProp
+scikit-learn
+joblib
+pandas
