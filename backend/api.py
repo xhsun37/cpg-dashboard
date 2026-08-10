@@ -1,18 +1,19 @@
+# 引入 FastAPI 主程式與靜態檔案託管模組
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 import os
 
+# 引入自定義的資料結構與計算引擎
 from schemas import SimInput, SimOutput
 from physics_engine import calculate_physics
 from finance_engine import calculate_economics
 
-# 改用 FastAPI 實例取代 APIRouter，方便直接執行
+# 建立 FastAPI 實例
 app = FastAPI(title="CPG Economic Analysis API")
 
-# 設定 CORS (允許跨域請求)
+# 設定 CORS，允許前端跨域請求 API
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,21 +22,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# API 路由 (注意：路徑改為 /api/simulate)
+# 定義 API 路由，接收前端參數並回傳模擬結果
 @app.post("/api/simulate", response_model=SimOutput)
 async def run_simulation(req: SimInput):
+    # 1. 呼叫物理引擎，取得 30 年的發電量與物理動態陣列
     power_mwh_array, co2_tons_array, temp_array, pressure_array, flow_array = calculate_physics(
         req.site_id, 1700.0, req.permeability_md, req.porosity, req.capacity_factor
     )
     
+    # 2. 呼叫財務引擎，取得 NPV 陣列與商業指標 (LCOE, IRR, DPP)
     npv_array, lcoe, dpp, irr = calculate_economics(
         req.carbon_price, req.fit_rate, req.discount_rate, power_mwh_array, co2_tons_array, req.capacity_factor
     )
     
+    # 3. 計算發電期 (第 11~30 年，陣列索引 10:30) 的平均 KPI 供前端顯示
     avg_co2 = float(np.mean(co2_tons_array[10:30])) if len(co2_tons_array) >= 30 else 0.0
     avg_power = float(np.mean(power_mwh_array[10:30])) if len(power_mwh_array) >= 30 else 0.0
     avg_flow = float(np.mean(flow_array[10:30])) if len(flow_array) >= 30 else 0.0
 
+    # 4. 打包所有數據回傳給前端
     return {
         "npv_array": npv_array,           
         "temp_array": temp_array,         
@@ -52,14 +57,11 @@ async def run_simulation(req: SimInput):
     }
 
 # ==========================================
-# 前後端合體設定：讓 FastAPI 託管前端檔案
+# 前後端合體設定：讓 FastAPI 直接託管前端網頁
 # ==========================================
-from fastapi.staticfiles import StaticFiles
-
 # 取得 frontend 資料夾的絕對路徑
 current_dir = os.path.dirname(os.path.abspath(__file__))
 frontend_dir = os.path.join(os.path.dirname(current_dir), "frontend")
 
-# 【核心修正】將 frontend 資料夾直接掛載到根目錄 "/"，並開啟 html=True
-# 這樣 FastAPI 會自動在根目錄尋找 index.html，且網頁也能正確載入同層級的 main.js
+# 將 frontend 資料夾掛載到根目錄 "/"，並開啟 html=True 自動尋找 index.html
 app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
