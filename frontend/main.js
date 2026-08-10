@@ -125,15 +125,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const valDisplay = document.getElementById('val_' + e.target.id);
             if (valDisplay) {
                 let displayVal = e.target.value;
-                if (e.target.id === 'discount_rate' || e.target.id === 'capacity_factor') {
+                
+                // 【核心修正】把 porosity (孔隙率) 也加入乘以 100 的百分比顯示邏輯中
+                if (e.target.id === 'discount_rate' || e.target.id === 'capacity_factor' || e.target.id === 'porosity') {
                     displayVal = (parseFloat(e.target.value) * 100).toFixed(2).replace(/\.00$/, '');
                 }
+                
                 valDisplay.innerText = displayVal + units[e.target.id];
             }
             debouncedUpdate();
         });
     });
-    
     // 網頁初次載入時，主動執行一次更新以繪製初始畫面
     updateDashboard();
 });
