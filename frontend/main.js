@@ -91,17 +91,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             document.getElementById('val_permeability_md').innerText = permSlider.value + ' mD';
             
-            // 【修正 1】切換案場時，孔隙率也要乘以 100 顯示
-            const poroPercent = Number((parseFloat(poroSlider.value) * 100).toFixed(2)).toString();
-            document.getElementById('val_porosity').innerText = poroPercent + ' %';
+            // 【修改 1】切換案場時，孔隙率直接顯示小數
+            document.getElementById('val_porosity').innerText = poroSlider.value;
             
             debouncedUpdate();
         });
     }
 
     const sliders = document.querySelectorAll('input[type="range"]');
+    
+    // 【修改 2】把 porosity 的單位改成空字串 ''
     const units = {
-        'permeability_md': ' mD', 'porosity': ' %', 'carbon_price': ' NTD',
+        'permeability_md': ' mD', 'porosity': '', 'carbon_price': ' NTD',
         'fit_rate': ' NTD', 'discount_rate': ' %', 'capacity_factor': ' %'
     };
 
@@ -111,8 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (valDisplay) {
                 let displayVal = e.target.value;
                 
-                // 【修正 2】更安全、更乾淨的百分比轉換寫法
-                if (e.target.id === 'discount_rate' || e.target.id === 'capacity_factor' || e.target.id === 'porosity') {
+                // 【修改 3】把 porosity 從這裡刪除，只保留折現率和容量因子需要 * 100
+                if (e.target.id === 'discount_rate' || e.target.id === 'capacity_factor') {
                     displayVal = Number((parseFloat(e.target.value) * 100).toFixed(2)).toString();
                 }
                 
