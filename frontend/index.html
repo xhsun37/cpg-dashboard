@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPG Economic Analysis System</title>
+    <title>CPGEAS</title>
     <style>
         /* 設定網頁主體樣式：深色背景、蘋果字體、隱藏外層滾動條 */
         body { 
@@ -23,7 +23,7 @@
         
         /* 設定主標題樣式：漸層色彩與文字裁切 */
         h2 {
-            font-size: 20px; font-weight: 600; margin: 0 0 12px 0; flex: 0 0 auto;
+            font-size: 24px; font-weight: 700; margin: 0 0 12px 0; flex: 0 0 auto;
             background: -webkit-linear-gradient(45deg, #30d158, #0a84ff);
             background: linear-gradient(45deg, #30d158, #0a84ff);
             -webkit-background-clip: text; background-clip: text;
@@ -109,7 +109,7 @@
 </head>
 <body>
     <!-- 系統主標題 -->
-    <h2>CO2 Plume Geothermal (CPG) Economic Analysis System</h2>
+    <h2>CPGEAS</h2>
     
     <div class="dashboard">
         <!-- 左側：參數控制面板 -->
@@ -124,8 +124,8 @@
                 <input type="range" id="permeability_md" min="100" max="1500" value="1100" step="10">
             </div>
             <div class="slider-group">
-            <div class="slider-label"><span>Porosity <span class="tooltip" data-tip="Ratio of void space in rock, affecting geothermal storage capacity">?</span></span><span class="slider-value" id="val_porosity">0.15</span></div>
-            <input type="range" id="porosity" min="0.01" max="0.3" value="0.15" step="0.01">
+                <div class="slider-label"><span>Porosity <span class="tooltip" data-tip="Ratio of void space in rock (fraction), affecting geothermal storage capacity">?</span></span><span class="slider-value" id="val_porosity">0.15</span></div>
+                <input type="range" id="porosity" min="0.01" max="0.3" value="0.15" step="0.01">
             </div>
             <div class="slider-group">
                 <div class="slider-label"><span>Carbon Tax Price <span class="tooltip" data-tip="Carbon tax cost per ton of CO2 leakage">?</span></span><span class="slider-value" id="val_carbon_price">300 NTD</span></div>
