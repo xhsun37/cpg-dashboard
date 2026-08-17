@@ -53,7 +53,8 @@ async def run_simulation(req: SimInput):
         "annual_power_mwh": round(avg_power, 2),
         "avg_flow_kg_s": round(avg_flow, 4),
         "avg_temp_c": round(float(np.mean(temp_array[10:30])), 2),
-        "avg_pressure_kpa": round(float(np.mean(pressure_array[10:30])), 2)
+        "avg_pressure_kpa": round(float(np.mean(pressure_array[10:30])), 2),
+        "design_power_mw": round(float(design_power_mw), 2)
     }
 
 # ==========================================
