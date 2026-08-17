@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CPGEAS</title>
     <style>
-        /* 設定網頁主體樣式：深色背景、蘋果字體、隱藏外層滾動條 */
         body { 
             background-color: #000000; 
             background-image: radial-gradient(circle at 15% 50%, rgba(20, 50, 80, 0.4), transparent 50%), 
@@ -21,7 +20,6 @@
             overflow: hidden; 
         }
         
-        /* 設定主標題樣式：漸層色彩與文字裁切 */
         h2 {
             font-size: 24px; font-weight: 700; margin: 0 0 12px 0; flex: 0 0 auto;
             background: -webkit-linear-gradient(45deg, #30d158, #0a84ff);
@@ -30,15 +28,10 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* 儀表板主容器：採用 Flexbox 左右排版 */
         .dashboard { display: flex; flex-direction: row; gap: 15px; flex: 1; min-height: 0; }
-        
-        /* 左側參數欄：固定寬度 320px，允許內部垂直滾動 */
         .left-sidebar { flex: 0 0 320px; display: flex; flex-direction: column; overflow-y: auto; padding-right: 5px; }
-        /* 右側主畫面：填滿剩餘空間 */
         .right-main { flex: 1; display: flex; flex-direction: column; gap: 15px; min-width: 0; }
 
-        /* 共用卡片樣式：毛玻璃效果 (Glassmorphism) 與陰影 */
         .panel { 
             background: rgba(28, 28, 30, 0.6); 
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -49,51 +42,56 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
 
-        /* KPI 面板高度自適應，圖表面板填滿剩餘高度 */
         .kpi-panel { flex: 0 0 auto; }
         .charts-panel { flex: 1; min-height: 0; }
 
-        /* 區塊副標題樣式 */
         h3 {
             font-size: 14px; font-weight: 500; color: #86868b;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 6px; margin: 0 0 12px 0; flex: 0 0 auto;
         }
 
-        /* 滑桿群組與標籤樣式 */
         .slider-group { margin-bottom: 12px; }
         .slider-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 12px; color: #d2d2d7; font-weight: 500; }
-        .slider-value { color: #0a84ff; font-weight: 600; font-size: 13px; }
         
-        /* 客製化 Range 滑桿樣式：隱藏預設外觀，自訂軌道與發光滑塊 */
+        /* 【新增】數字輸入框樣式 */
+        .input-wrapper {
+            display: flex; align-items: center; background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px; padding: 2px 8px; border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: border-color 0.2s;
+        }
+        .input-wrapper:focus-within { border-color: #0a84ff; }
+        .num-input {
+            background: transparent; border: none; color: #0a84ff; font-weight: 600;
+            font-size: 13px; width: 55px; text-align: right; outline: none; font-family: inherit;
+        }
+        /* 隱藏輸入框的上下箭頭 */
+        .num-input::-webkit-outer-spin-button, .num-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .num-input[type=number] { -moz-appearance: textfield; }
+        .unit-text { color: #86868b; font-size: 11px; margin-left: 4px; font-weight: 500; }
+
         input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; background: transparent; }
         input[type=range]:focus { outline: none; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 5px; cursor: pointer; background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
         input[type=range]::-webkit-slider-thumb { height: 16px; width: 16px; border-radius: 50%; background: #ffffff; cursor: pointer; -webkit-appearance: none; appearance: none; margin-top: -5.5px; box-shadow: 0 0 8px rgba(10, 132, 255, 0.5); transition: transform 0.1s; }
         input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 
-        /* KPI 網格排版：使用 CSS Grid 自動換行適應寬度 */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
         .kpi-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 10px 8px; border-radius: 12px; text-align: center; }
         .kpi-title { font-size: 11px; color: #86868b; margin-bottom: 4px; font-weight: 500; }
         .kpi-value { font-size: 18px; font-weight: 600; color: #ffffff; letter-spacing: 0.5px; }
-        /* 財務指標特別標示為綠色 */
         .highlight-finance .kpi-value { color: #30d158; }
 
-        /* Tooltip 提示圖示與懸停浮動視窗樣式 */
         .tooltip { display: inline-flex; justify-content: center; align-items: center; width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.2); color: #fff; font-size: 9px; margin-left: 4px; cursor: help; position: relative; font-weight: bold; }
         .tooltip::after { content: attr(data-tip); position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%); background: rgba(40, 40, 40, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 11px; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10; font-weight: normal; }
         .tooltip:hover::after { opacity: 1; visibility: visible; bottom: 150%; }
         
-        /* 下拉選單樣式 */
         select { width: 100%; padding: 6px 8px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; outline: none; cursor: pointer; font-size: 12px; font-family: inherit; }
         select option { background: #2d2d2d; color: white; }
 
-        /* 圖表區 2x2 網格排版 */
         .charts-wrapper { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 15px; width: 100%; flex: 1; min-height: 0; }
         .chart-item { width: 100%; height: 100%; min-height: 0; }
 
-        /* 響應式設計 (RWD)：當螢幕寬度小於 1000px 時，改為上下單欄排版 */
         @media (max-width: 1000px) {
             .dashboard { flex-direction: column; overflow-y: auto; }
             .left-sidebar { flex: 0 0 auto; width: 100%; }
@@ -101,53 +99,73 @@
             .chart-item { min-height: 250px; }
         }
 
-        /* 隱藏 Plotly 底部拉桿內的預覽線條，並自訂拉桿背景色 */
         .rangeslider-container .scatterlayer { display: none !important; }
         .rangeslider-bg { fill: #2c2c2e !important; stroke: none !important; }
         .rangeslider-mask-min, .rangeslider-mask-max { fill: rgba(0, 0, 0, 0.6) !important; }
     </style>
 </head>
 <body>
-    <!-- 系統主標題 -->
     <h2>CPGEAS</h2>
     
     <div class="dashboard">
-        <!-- 左側：參數控制面板 -->
         <div class="left-sidebar panel">
             <h3>Physical & Economic Parameters</h3>
             <div class="slider-group">
                 <div class="slider-label"><span>Select Site <span class="tooltip" data-tip="Switch between site-specific AI models and geological constants">?</span></span></div>
                 <select id="site_id"><option value="KYS">Taoyuan Guanyinshan (KYS)</option></select>
             </div>
+            
+            <!-- 【修改】加入數字輸入框，並將百分比參數改為整數顯示 -->
             <div class="slider-group">
-                <div class="slider-label"><span>Permeability <span class="tooltip" data-tip="Ability of rock to transmit fluids, affecting CO2 circulation rate">?</span></span><span class="slider-value" id="val_permeability_md">1100 mD</span></div>
-                <input type="range" id="permeability_md" min="100" max="1500" value="1100" step="10">
+                <div class="slider-label">
+                    <span>Permeability <span class="tooltip" data-tip="Ability of rock to transmit fluids, affecting CO2 circulation rate">?</span></span>
+                    <div class="input-wrapper"><input type="number" id="num_permeability_md" class="num-input" min="100" max="1500" step="1" value="1100"><span class="unit-text">mD</span></div>
+                </div>
+                <input type="range" id="permeability_md" min="100" max="1500" value="1100" step="1">
             </div>
+            
             <div class="slider-group">
-                <div class="slider-label"><span>Porosity <span class="tooltip" data-tip="Ratio of void space in rock (fraction), affecting geothermal storage capacity">?</span></span><span class="slider-value" id="val_porosity">0.15</span></div>
-                <input type="range" id="porosity" min="0.01" max="0.3" value="0.15" step="0.01">
+                <div class="slider-label">
+                    <span>Porosity <span class="tooltip" data-tip="Ratio of void space in rock, affecting geothermal storage capacity">?</span></span>
+                    <div class="input-wrapper"><input type="number" id="num_porosity" class="num-input" min="10" max="40" step="0.001" value="15"><span class="unit-text">%</span></div>
+                </div>
+                <input type="range" id="porosity" min="10" max="40" value="15" step="0.001">
             </div>
+            
             <div class="slider-group">
-                <div class="slider-label"><span>Carbon Tax Price <span class="tooltip" data-tip="Carbon tax cost per ton of CO2 leakage">?</span></span><span class="slider-value" id="val_carbon_price">300 NTD</span></div>
+                <div class="slider-label">
+                    <span>Carbon Tax Price <span class="tooltip" data-tip="Carbon tax cost per ton of CO2 leakage">?</span></span>
+                    <div class="input-wrapper"><input type="number" id="num_carbon_price" class="num-input" min="0" max="5000" step="10" value="300"><span class="unit-text">NTD</span></div>
+                </div>
                 <input type="range" id="carbon_price" min="0" max="5000" value="300" step="10">
             </div>
+            
             <div class="slider-group">
-                <div class="slider-label"><span>Feed-in Tariff (FIT) <span class="tooltip" data-tip="Guaranteed government purchase price per kWh of green electricity">?</span></span><span class="slider-value" id="val_fit_rate">8.55 NTD</span></div>
+                <div class="slider-label">
+                    <span>Feed-in Tariff (FIT) <span class="tooltip" data-tip="Guaranteed government purchase price per kWh of green electricity">?</span></span>
+                    <div class="input-wrapper"><input type="number" id="num_fit_rate" class="num-input" min="1.0" max="15.0" step="0.01" value="8.55"><span class="unit-text">NTD</span></div>
+                </div>
                 <input type="range" id="fit_rate" min="1.0" max="15.0" value="8.55" step="0.01">
             </div>
+            
             <div class="slider-group">
-                <div class="slider-label"><span>Discount Rate <span class="tooltip" data-tip="Interest rate reflecting the time value of money and investment risk">?</span></span><span class="slider-value" id="val_discount_rate">5.25 %</span></div>
-                <input type="range" id="discount_rate" min="0.01" max="0.15" value="0.0525" step="0.0025">
+                <div class="slider-label">
+                    <span>Discount Rate <span class="tooltip" data-tip="Interest rate reflecting the time value of money and investment risk">?</span></span>
+                    <div class="input-wrapper"><input type="number" id="num_discount_rate" class="num-input" min="1.0" max="15.0" step="0.01" value="5.25"><span class="unit-text">%</span></div>
+                </div>
+                <input type="range" id="discount_rate" min="1.0" max="15.0" value="5.25" step="0.01">
             </div>
+            
             <div class="slider-group">
-                <div class="slider-label"><span>Capacity Factor <span class="tooltip" data-tip="Ratio of actual electrical energy output to maximum possible output">?</span></span><span class="slider-value" id="val_capacity_factor">80 %</span></div>
-                <input type="range" id="capacity_factor" min="0.5" max="1.0" value="0.8" step="0.01">
+                <div class="slider-label">
+                    <span>Capacity Factor <span class="tooltip" data-tip="Ratio of actual electrical energy output to maximum possible output">?</span></span>
+                    <div class="input-wrapper"><input type="number" id="num_capacity_factor" class="num-input" min="50" max="100" step="0.1" value="80"><span class="unit-text">%</span></div>
+                </div>
+                <input type="range" id="capacity_factor" min="50" max="100" value="80" step="0.1">
             </div>
         </div>
 
-        <!-- 右側：主畫面 -->
         <div class="right-main">
-            <!-- 右上：KPI 顯示面板 -->
             <div class="panel kpi-panel">
                 <h3>Financial & Physical KPIs (6-Well Field)</h3>
                 <div class="kpi-grid">
@@ -155,14 +173,14 @@
                     <div class="kpi-box highlight-finance"><div class="kpi-title">IRR <span class="tooltip" data-tip="Internal Rate of Return: Annualized return on investment; higher is better">?</span></div><span id="irr" class="kpi-value">0.00</span></div>
                     <div class="kpi-box highlight-finance"><div class="kpi-title">Payback Period <span class="tooltip" data-tip="Discounted Payback Period: Years required to recover the initial investment">?</span></div><span id="dpp" class="kpi-value">0.00</span></div>
                     <div class="kpi-box"><div class="kpi-title">Est. Annual Gen.</div><span id="annual_power_mwh" class="kpi-value">0</span></div>
-                    <div class="kpi-box"><div class="kpi-title">Avg. Bottom Temp.</div><span id="kpi_temp" class="kpi-value">0.00</span></div>
-                    <div class="kpi-box"><div class="kpi-title">Avg. Bottom Press.</div><span id="kpi_pressure" class="kpi-value">0</span></div>
+                    <!-- 【修改】刪除 Bottom 文字 -->
+                    <div class="kpi-box"><div class="kpi-title">Avg. Temp.</div><span id="kpi_temp" class="kpi-value">0.00</span></div>
+                    <div class="kpi-box"><div class="kpi-title">Avg. Press.</div><span id="kpi_pressure" class="kpi-value">0</span></div>
                     <div class="kpi-box"><div class="kpi-title">Avg. CO2 Flow Rate</div><span id="kpi_flow" class="kpi-value">0.00</span></div>
                     <div class="kpi-box"><div class="kpi-title">Annual Carbon Cost</div><span id="annual_co2_tons" class="kpi-value">0</span></div>
                 </div>
             </div>
 
-            <!-- 右下：4 張獨立圖表顯示區 -->
             <div class="panel charts-panel">
                 <h3>Project Forecast Curves (Drag slider or scroll to zoom)</h3>
                 <div class="charts-wrapper">
@@ -175,8 +193,7 @@
         </div>
     </div>
 
-    <!-- 引入 Plotly.js 繪圖庫與主程式 -->
     <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
-    <script type="module" src="main.js?v=3"></script>
+    <script type="module" src="main.js?v=4"></script>
 </body>
 </html>
