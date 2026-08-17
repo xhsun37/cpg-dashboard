@@ -1,4 +1,4 @@
-import { fetchSimulationData, debounce } from './api_client.js';
+import { fetchSimulationData, debounce } from './api_client.js?v=5';
 
 function renderPlotlyCharts(data) {
     const totalYears = data.npv_array.length; 
