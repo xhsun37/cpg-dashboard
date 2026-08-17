@@ -27,3 +27,4 @@ class SimOutput(BaseModel):
     avg_temp_c: float            # 發電期平均井底溫度 (°C)
     avg_pressure_kpa: float      # 發電期平均井底壓力 (kPa)
     avg_flow_kg_s: float         # 發電期平均 CO2 流率 (kg/s)
+    design_power_mw: float  # 【新增】裝置容量 (MW)
