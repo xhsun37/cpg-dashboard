@@ -105,4 +105,4 @@ def calculate_economics(carbon_price_ntd: float, fit_rate_ntd: float, discount_r
     # 計算 30 年全生命週期的 IRR
     irr = calculate_stable_irr(cash_flows_for_irr) * 100.0
         
-    return npv_array, lcoe, dpp, irr
+    return npv_array, lcoe, dpp, irr, design_power_mw
