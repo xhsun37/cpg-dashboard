@@ -31,15 +31,17 @@ function renderPlotlyCharts(data) {
         yaxis: { title: {text: 'kg/s', font: {size: 11}}, gridcolor: 'rgba(255,255,255,0.05)', fixedrange: true, rangemode: 'tozero' }
     };
 
+    // 【修改】刪除 Bottom-hole 文字
     const traceTemp = { x: physYears, y: data.temp_array, type: 'scatter', mode: 'lines', name: 'Temperature', line: { color: '#ff9f0a', width: 3 } };
     const layoutTemp = { ...commonLayout, 
-        title: { text: 'Bottom-hole Temp. Decline (°C)', font: { color: '#fff', size: 13 } },
+        title: { text: 'Temp. Decline (°C)', font: { color: '#fff', size: 13 } },
         yaxis: { title: {text: '°C', font: {size: 11}}, gridcolor: 'rgba(255,255,255,0.05)', fixedrange: true }
     };
 
+    // 【修改】刪除 Bottom-hole 文字
     const tracePress = { x: physYears, y: data.pressure_array, type: 'scatter', mode: 'lines', name: 'Pressure', line: { color: '#bf5af2', width: 3 } };
     const layoutPress = { ...commonLayout, 
-        title: { text: 'Bottom-hole Pressure Decline (kPa)', font: { color: '#fff', size: 13 } },
+        title: { text: 'Pressure Decline (kPa)', font: { color: '#fff', size: 13 } },
         yaxis: { title: {text: 'kPa', font: {size: 11}}, gridcolor: 'rgba(255,255,255,0.05)', fixedrange: true }
     };
 
@@ -83,44 +85,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const siteSelect = document.getElementById('site_id');
     if (siteSelect) {
         siteSelect.addEventListener('change', (e) => {
-            const permSlider = document.getElementById('permeability_md');
-            const poroSlider = document.getElementById('porosity');
             if (e.target.value === 'KYS') {
-                permSlider.min = 100; permSlider.max = 1500; permSlider.value = 1100;
-                poroSlider.min = 0.01; poroSlider.max = 0.3; poroSlider.value = 0.15;
+                document.getElementById('permeability_md').value = 1100;
+                document.getElementById('num_permeability_md').value = 1100;
+                
+                document.getElementById('porosity').value = 15;
+                document.getElementById('num_porosity').value = 15;
             }
-            document.getElementById('val_permeability_md').innerText = permSlider.value + ' mD';
-            
-            // 【修正】切換案場時，孔隙率直接顯示小數
-            document.getElementById('val_porosity').innerText = poroSlider.value;
-            
             debouncedUpdate();
         });
     }
 
-    const sliders = document.querySelectorAll('input[type="range"]');
+    // 【新增】雙向綁定邏輯：滑桿與輸入框互相連動
+    const params = ['permeability_md', 'porosity', 'carbon_price', 'fit_rate', 'discount_rate', 'capacity_factor'];
     
-    // 【修正】把 porosity 的單位改成空字串 ''
-    const units = {
-        'permeability_md': ' mD', 'porosity': '', 'carbon_price': ' NTD',
-        'fit_rate': ' NTD', 'discount_rate': ' %', 'capacity_factor': ' %'
-    };
+    params.forEach(param => {
+        const slider = document.getElementById(param);
+        const numInput = document.getElementById('num_' + param);
 
-    sliders.forEach(input => {
-        input.addEventListener('input', (e) => {
-            const valDisplay = document.getElementById('val_' + e.target.id);
-            if (valDisplay) {
-                let displayVal = e.target.value;
-                
-                // 【修正】只保留折現率和容量因子需要 * 100，孔隙率直接顯示小數
-                if (e.target.id === 'discount_rate' || e.target.id === 'capacity_factor') {
-                    displayVal = Number((parseFloat(e.target.value) * 100).toFixed(2)).toString();
-                }
-                
-                valDisplay.innerText = displayVal + units[e.target.id];
-            }
+        // 當滑桿被拖曳時 -> 更新輸入框
+        slider.addEventListener('input', (e) => {
+            numInput.value = e.target.value;
             debouncedUpdate();
         });
+
+        // 當輸入框被手動輸入時 -> 更新滑桿
+        numInput.addEventListener('input', (e) => {
+            let val = parseFloat(e.target.value);
+            if (!isNaN(val)) {
+                slider.value = val;
+                debouncedUpdate();
+            }
+        });
     });
+    
     updateDashboard();
 });
