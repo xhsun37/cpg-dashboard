@@ -69,6 +69,7 @@ async function updateDashboard() {
         updateText('annual_co2_tons', carbonCost.toLocaleString() + ' NTD');
         
         updateText('annual_power_mwh', Math.round(data.annual_power_mwh || 0).toLocaleString() + ' MWh');
+        updateText('design_power_mw', (data.design_power_mw || 0).toFixed(2) + ' MW');
         updateText('kpi_temp', (data.avg_temp_c || 0).toFixed(1) + ' °C');
         updateText('kpi_pressure', Math.round(data.avg_pressure_kpa || 0).toLocaleString() + ' kPa');
         updateText('kpi_flow', (data.avg_flow_kg_s || 0).toFixed(1) + ' kg/s');
