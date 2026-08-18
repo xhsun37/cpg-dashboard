@@ -83,7 +83,35 @@
         .highlight-finance .kpi-value { color: #30d158; }
 
         .tooltip { display: inline-flex; justify-content: center; align-items: center; width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.2); color: #fff; font-size: 9px; margin-left: 4px; cursor: help; position: relative; font-weight: bold; }
-        .tooltip::after { content: attr(data-tip); position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%); background: rgba(40, 40, 40, 0.95); backdrop-filter: blur(10px); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 11px; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.2s ease; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10; font-weight: normal; }
+        .tooltip::after { 
+            content: attr(data-tip); 
+            position: absolute; 
+            bottom: 130%; 
+            /* 【修正 1】改為靠左對齊，避免向左溢出螢幕 */
+            left: 0; 
+            transform: translateX(-10px); 
+            background: rgba(40, 40, 40, 0.95); 
+            backdrop-filter: blur(10px); 
+            color: #fff; 
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            font-size: 11px; 
+            /* 【修正 2】允許文字自動換行 */
+            white-space: normal; 
+            width: max-content;
+            /* 【修正 3】限制最大寬度，文字太長會自動往下折行 */
+            max-width: 220px; 
+            /* 【修正 4】文字靠左對齊，增加行高讓閱讀更舒適 */
+            text-align: left;
+            line-height: 1.4;
+            opacity: 0; 
+            visibility: hidden; 
+            transition: all 0.2s ease; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
+            z-index: 100; 
+            font-weight: normal; 
+        }
         .tooltip:hover::after { opacity: 1; visibility: visible; bottom: 150%; }
         
         select { width: 100%; padding: 6px 8px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; outline: none; cursor: pointer; font-size: 12px; font-family: inherit; }
